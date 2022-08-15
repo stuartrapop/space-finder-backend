@@ -1,10 +1,22 @@
 @endpoint=https://xh06opvab4.execute-api.eu-central-1.amazonaws.com/prod
 
-GET {{endpoint}}/hello
+
+GET {{endpoint}}/spaces?spaceId=3c286770-dc47-4ddc-92ae-444ff0a5d53d
+###
+
+DELETE {{endpoint}}/spaces?spaceId=74182cdb-df71-4fa5-b37a-0369d30fd351
 ###
 
 
-GET {{endpoint}}/spaces?spaceId=3c286770-dc47-4ddc-92ae-444ff0a5d53d
+PUT {{endpoint}}/spaces?spaceId=3c286770-dc47-4ddc-92ae-444ff0a5d53d
+Content-Type: application/json
+
+{
+    "location" : "Updated"
+}
+###
+
+GET {{endpoint}}/spaces?location=London
 ###
 
 

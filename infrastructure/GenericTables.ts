@@ -1,6 +1,7 @@
 import { Stack } from 'aws-cdk-lib';
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { join } from 'path';
 
@@ -11,6 +12,7 @@ export interface TableProps {
   readLambdaPath?: string;
   updateLambdaPath?: string;
   deleteLambdaPath?: string;
+  secondaryIndexes?: string[];
 }
 
 export class GenericTable {
@@ -37,6 +39,7 @@ export class GenericTable {
 
   private initalize() {
     this.createTable();
+    this.addSecondaryIndexes();
     this.createLambdas();
     this.grantTableRights();
   }
@@ -49,6 +52,20 @@ export class GenericTable {
       },
       tableName: this.props.tableName,
     });
+  }
+
+  private addSecondaryIndexes() {
+    if (this.props.secondaryIndexes) {
+      for (const secondaryIndex of this.props.secondaryIndexes) {
+        this.table.addGlobalSecondaryIndex({
+          indexName: secondaryIndex,
+          partitionKey: {
+            name: secondaryIndex,
+            type: AttributeType.STRING,
+          },
+        });
+      }
+    }
   }
 
   private createLambdas() {
@@ -97,6 +114,7 @@ export class GenericTable {
       ),
       handler: 'handler',
       functionName: lambdaId,
+      runtime: Runtime.NODEJS_14_X,
       environment: {
         TABLE_NAME: this.props.tableName,
         PRIMARY_KEY: this.props.primaryKey,
